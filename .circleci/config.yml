@@ -8,7 +8,7 @@ executors:
     docker:
       - image: circleci/node:12.9.1-browsers
 
-    working_directory: ./test-app
+    working_directory: ./
 
 jobs:
   build-deploy-staging:
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: ./test-app
+          at: ./
 
       - run:
           name: build
@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: ./test-app
+          at: ./
 
       - run:
           name: build
