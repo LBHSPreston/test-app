@@ -5,7 +5,7 @@ orbs:
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
 
 references:
-  workspace_root: &workspace_root "~"
+  workspace_root: &workspace_root "~/repo"
   attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
