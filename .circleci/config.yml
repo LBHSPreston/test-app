@@ -11,6 +11,18 @@ executors:
     working_directory: ~/repo
 
 jobs:
+  install-dependencies:
+    executor: my-executor
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
   build-deploy-staging:
     executor: fss-executor
 
@@ -57,7 +69,10 @@ workflows:
   version: 2
   continuous-delivery:
     jobs:
+      - install-dependencies
       - build-deploy-staging:
+          requires:
+            - install-dependencies
           filters:
             branches:
               only:
