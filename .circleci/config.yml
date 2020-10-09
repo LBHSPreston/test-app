@@ -10,6 +10,22 @@ executors:
 
     working_directory: ~/repo
 
+commands:
+  assume-role-and-persist-workspace:
+    description: "Assumes deployment role and persists credentials across jobs"
+    parameters:
+      aws-account:
+        type: string
+    steps:
+      - checkout
+      - aws_assume_role/assume_role:
+          account: <<parameters.aws-account>>
+          profile_name: default
+          role: "LBH_Circle_CI_Deployment_Role"
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - .aws
 jobs:
   install-dependencies:
     executor: fss-executor
@@ -26,6 +42,18 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+
+  assume-role-staging:
+    executor: fss-executor
+    steps:
+      - assume-role-and-persist-workspace:
+          aws-account: $AWS_ACCOUNT_STAGING
+
+  assume-role-production:
+    executor: fss-executor
+    steps:
+      - assume-role-and-persist-workspace:
+          aws-account: $AWS_ACCOUNT_PRODUCTION
 
   build-deploy-staging:
     executor: fss-executor
@@ -74,9 +102,17 @@ workflows:
   continuous-delivery:
     jobs:
       - install-dependencies
-      - build-deploy-staging:
+      - assume-role-staging:
+          context: api-assume-role-staging-context
           requires:
             - install-dependencies
+          filters:
+            branches:
+              only:
+                - master
+      - build-deploy-staging:
+          requires:
+            - assume-role-staging
           filters:
             branches:
               only:
@@ -85,6 +121,14 @@ workflows:
           type: approval
           requires:
             - build-deploy-staging
-      - build-deploy-production:
+      - assume-role-production:
+          context: api-assume-role-production-context
           requires:
             - permit-deploy-production
+          filters:
+            branches:
+              only:
+                - master
+      - build-deploy-production:
+          requires:
+            - assume-role-production
