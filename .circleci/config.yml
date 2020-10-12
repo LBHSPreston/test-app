@@ -70,7 +70,7 @@ jobs:
             npm run build
       - aws-s3/sync:
           from: build
-          to: 's3://find-support-services-staging.hackney.gov.uk/'
+          to: 's3://find-support-services-staging/'
           arguments: |
             --acl public-read \
             --cache-control "max-age=86400"
