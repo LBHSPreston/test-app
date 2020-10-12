@@ -47,12 +47,6 @@ jobs:
           root: "~/repo"
           paths: .
 
-  assume-role-development:
-  executor: fss-executor
-  steps:
-    - assume-role-and-persist-workspace:
-        aws-account: $AWS_ACCOUNT_DEVELOPMENT
-
   assume-role-staging:
     executor: fss-executor
     steps:
@@ -64,23 +58,6 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-
-  build-deploy-development:
-    executor: fss-executor
-    steps:
-      - *attach_workspace
-      - run:
-          name: build
-          command: |
-            export REACT_APP_ENV=development
-            npm run build
-      - aws-s3/sync:
-          from: build
-          to: 's3://find-support-services-development/'
-          arguments: |
-            --acl public-read \
-            --cache-control "max-age=86400"
-          overwrite: true
 
   build-deploy-staging:
     executor: fss-executor
