@@ -37,16 +37,12 @@ commands:
 jobs:
   install-dependencies:
     executor: fss-executor
-
     working_directory: *workspace_root
-
     steps:
       - checkout
-
       - run:
           name: Install dependencies
           command: npm install
-      
       - persist_to_workspace:
           root: "~/repo"
           paths: .
@@ -71,16 +67,13 @@ jobs:
 
   build-deploy-development:
     executor: fss-executor
-
     steps:
       - *attach_workspace
-
       - run:
           name: build
           command: |
             export REACT_APP_ENV=development
             npm run build
-
       - aws-s3/sync:
           from: build
           to: 's3://find-support-services-development/'
@@ -91,16 +84,13 @@ jobs:
 
   build-deploy-staging:
     executor: fss-executor
-
     steps:
       - *attach_workspace
-
       - run:
           name: build
           command: |
             export REACT_APP_ENV=staging
             npm run build
-
       - aws-s3/sync:
           from: build
           to: 's3://find-support-services-staging.hackney.gov.uk/'
@@ -111,16 +101,13 @@ jobs:
 
   build-deploy-production:
     executor: fss-executor
-
     steps:
       - *attach_workspace
-
       - run:
           name: build
           command: |
             export REACT_APP_ENV=production
             npm run build
-
       - aws-s3/sync:
           from: build
           to: 's3://find-support-services-staging.hackney.gov.uk/'
@@ -179,3 +166,7 @@ workflows:
       - build-deploy-production:
           requires:
             - assume-role-production
+          filters:
+            branches:
+              only:
+                - master
