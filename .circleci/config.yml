@@ -31,7 +31,7 @@ commands:
           profile_name: default
           role: "LBH_Circle_CI_Deployment_Role"
       - persist_to_workspace:
-          root: *workspace_root
+          root: "~/repo"
           paths:
             - .aws
 jobs:
@@ -48,7 +48,7 @@ jobs:
           command: npm install
       
       - persist_to_workspace:
-          root: *workspace_root
+          root: "~/repo"
           paths: .
 
   assume-role-staging:
