@@ -55,7 +55,8 @@ jobs:
     executor: fss-executor
     steps:
       - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_STAGING
+          # Change this back to staging!!!
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
 
   assume-role-production:
     executor: fss-executor
@@ -77,7 +78,8 @@ jobs:
 
       - aws-s3/sync:
           from: build
-          to: 's3://find-support-services-staging.hackney.gov.uk/'
+          # Change this back to staging.hackney.gov.uk!!!
+          to: 's3://find-support-services-development'
           arguments: |
             --acl public-read \
             --cache-control "max-age=86400"
