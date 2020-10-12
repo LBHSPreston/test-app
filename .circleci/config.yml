@@ -51,12 +51,17 @@ jobs:
           root: "~/repo"
           paths: .
 
+  assume-role-development:
+  executor: fss-executor
+  steps:
+    - assume-role-and-persist-workspace:
+        aws-account: $AWS_ACCOUNT_DEVELOPMENT
+
   assume-role-staging:
     executor: fss-executor
     steps:
       - assume-role-and-persist-workspace:
-          # Change this back to staging!!!
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          aws-account: $AWS_ACCOUNT_STAGING
 
   assume-role-production:
     executor: fss-executor
@@ -78,8 +83,7 @@ jobs:
 
       - aws-s3/sync:
           from: build
-          # Change this back to staging.hackney.gov.uk!!!
-          to: 's3://find-support-services-development'
+          to: 's3://find-support-services-staging.hackney.gov.uk/'
           arguments: |
             --acl public-read \
             --cache-control "max-age=86400"
@@ -110,10 +114,25 @@ workflows:
   continuous-delivery:
     jobs:
       - install-dependencies
+      - assume-role-development:
+          context: api-assume-role-development-context
+          requires:
+            - install-dependencies
+          filters:
+            branches:
+              only:
+                - master
+      - build-deploy-development:
+          requires:
+            - assume-role-development
+          filters:
+            branches:
+              only:
+                - master
       - assume-role-staging:
           context: api-assume-role-staging-context
           requires:
-            - install-dependencies
+            - build-deploy-development
           filters:
             branches:
               only:
